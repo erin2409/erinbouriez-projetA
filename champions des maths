@@ -1,1 +1,322 @@
+#include <stdio.h> // bibliotheque standar pour l'entrée et la sortie
+#include<stdlib.h> // pour les fonctions rand, srand
+#include<time.h> // pour la date, lheure et le temps
+#include<string.h> // pour les chaines de caracteres (strcmps,strcpy)
+#define max_nom 40 // la taille maximale du nom
+#define file_name "scores.txt" // nom du fichier de sauvegarde
+// fonction pour enregistrer le score 
+void enrg_score(const char*nom,int score ){
+    FILE*fichier=fopen("scores.txt","a"); // ouvre le fichier en mode ajout (apprend)
+    
+    if (fichier==NULL){ //verifie si le fichier est ouvert 
+        printf("erreur d'ouverture\n");
+        return ;
+    }
+    
+    time_t tps=time(NULL); // recuperer l'heure
+    struct tm*tm_info=localtime(&tps);
+    char date_heure[30];
+    strftime((date_heure),sizeof(date_heure),"%d/%m/%Y %H:%M:%S",tm_info);
+    //enregistre dans fichier
+    fprintf(fichier,"nom:%s\n",nom);
+    fprintf(fichier,"date et heure : %s\n",date_heure);
+    fprintf(fichier,"score: %d\n\n",score);
+    // fermer le fichier
+    fclose(fichier);
+    printf("votre score a été enregistré\n");
+}
+int changer_score(const char* nom) {
+    FILE* fichier = fopen(file_name, "r"); // ouvre en lecture
+    if (fichier == NULL) {
+        return 0;  // Aucun fichier donc aucun score
+    }
+    char ligne[100];
+    char nom_lu[max_nom];
+    int score = 0;
+    int score_trouve = 0;
+    
+    while(fgets(ligne,sizeof(ligne),fichier)){
+        if (sscanf(ligne,"nom:%s",nom_lu)==1){ //cherche une ligne avec un nom
+            if(strcmp(nom,nom_lu)==0){ // si le nom correspond
+                fgets(ligne,sizeof(ligne),fichier); // passe la ligne date
+                fgets(ligne,sizeof(ligne),fichier); // passe la ligne "score"
+                sscanf(ligne,"score: %d",&score); // extrait le score
+                }
+            }
+        }
+    fclose (fichier); 
+    return score;
+}
+int main(){
+    int choix=1;
+    int score=0;
+    int a,b,c,reponse,bonne_reponse,table,resultat;
+    char nom[max_nom];
 
+    printf("quel est votre nom ?\n");
+    scanf("%s",nom);
+    getchar();
+    score = changer_score(nom);
+    printf("bienvenue %s, votre score actuel est de %d\n",nom,score);
+    
+    while (choix!=0){
+        printf("+-----------------------------------+\n");
+        printf("| 1 : Addition                      |\n");
+        printf("| 2 : Soustraction                  |\n");
+        printf("| 3 : Multiplication                |\n");
+        printf("| 4 : Tables des multiplications    |\n");
+        printf("| 5 : Divisions                     |\n");
+        printf("| 6 : Complement à 100              |\n");
+        printf("| 7 : Double ou moitié              |\n");
+        printf("| 8 : Suite logique                 |\n");
+        printf("| 0 : Sortir du jeu                 |\n");
+        printf("+-----------------------------------+\n");
+        printf("Quel est votre choix ? ");
+        scanf("%d", &choix);
+        printf("\n");
+        /*if(choix==1){
+            printf("Addition\n");}
+        else if (choix==2){
+            printf("Soustraction\n");}
+        else if (choix==3){
+            printf("Multiplication\n");}
+        else if (choix==4){
+            printf("Tables de multiplication\n");}
+        else if (choix==5){
+            printf("Division\n");}
+        else if (choix==6){
+            printf("Complement à 100\n");}
+        else if (choix==7){
+            printf("Double ou moitié\n");}
+        else if (choix==8){
+            printf("Suite logique\n");}
+        else{
+            printf("sortir du jeu\n");} */
+        
+        switch (choix){
+            case 1 : printf("Addition\n");break;
+            case 2 : printf ("Soustraction\n");break;
+            case 3 : printf("Multiplication\n");break;
+            case 4 : printf ("Tables de multiplication\n");break;
+            case 5 : printf("Division\n");break;
+            case 6 : printf("Complement à 100\n");break;
+            case 7 : printf ("Double ou moitié\n");break;
+            case 8 : printf("Suite logique\n");break;
+            case 0 : printf ("Sortir du jeu\n");break;
+        }
+        if (choix==1){
+            srand(time(NULL)); // initialise le generateur aléatoire
+            a = rand()%101;
+            b = rand()%101;
+            bonne_reponse = a + b;
+            int essais =0;
+            int reussi = 0;
+            while (essais<3){
+                printf("%d + %d ?\n",a,b);
+                printf("Entrez le resultat : ");
+                scanf("%d",&reponse);
+                essais ++;
+                if(reponse == bonne_reponse){
+                    if (essais == 1) score += 10;
+                    else if (essais == 2) score +=5;
+                    else if (essais ==3) score +=1;
+                    printf("Bravo vous avez trouvez en %d essai(s)\n",essais);
+                    reussi = 1;break;
+                } else {
+                    printf("essayez encore\n");
+                }
+            }enrg_score(nom,score);
+            if (!reussi){
+                printf("la bonne reponse etait %d\n",bonne_reponse);
+            }
+        } 
+        
+        if (choix == 0){
+            printf("merci de votre visite\n");
+        }
+        if (choix == 2){
+            srand(time(NULL));
+            a = rand()%101;
+            b = rand()% 101;
+            if (a<b){
+                c = b;
+                b = a;
+                a = c;
+            }
+            bonne_reponse = a - b;
+            int essais = 0 ;
+            int reussi = 0 ;
+            while (essais < 3){
+                printf("%d - %d ?\n",a,b);
+                printf("entrez le resultat \n");
+                scanf("%d",&reponse);
+                essais ++;
+                if (reponse == bonne_reponse){
+                    if (essais == 1 )score +=10;
+                    else if (essais ==2)score +=5;
+                    else if (essais == 3)score+=1;
+                    printf("bravo vous avez trouvez en %d essai(s)\n",essais);
+                    reussi = 1; break;
+                } else {
+                    if (essais < 3)
+                    printf("essayez encore\n");
+                }
+            }enrg_score(nom,score);
+            if (!reussi){
+                printf("la bonne reponse etait %d\n",bonne_reponse);
+            }
+        }
+        
+        if (choix == 3 ){
+            srand(time(NULL));
+            a=rand()%11;
+            b=rand()%11;
+            bonne_reponse = a * b;
+            int essais = 0;
+            int reussi = 0;
+            while ( essais < 3){
+                printf("%d * %d ? \n",a,b);
+                printf("entrez le resultat :");
+                scanf("%d",&reponse);
+                essais ++;
+                if(reponse == bonne_reponse){
+                    if (essais ==1) score +=10;
+                    else if (essais == 2)score +=5;
+                    else if (essais == 3)score +=1;
+                    printf("bravo vous avez trouvez en %d essai(s)\n",essais);
+                    enrg_score(nom,score);
+                    reussi=1;break;
+                } else {
+                    if (essais<3)
+                    printf("essayez encore\n");
+                }
+            }enrg_score(nom,score);
+        } 
+        if (choix == 4 ){
+            printf("sur quelle table voulez vous travailler?\n");
+            scanf("%d",&table);
+            for (int i = 1; i<=10; i++){
+                printf("%d X %d = %d\n",table,i,table*i);
+            }
+            for (int j = 1; j<=10 ; j++){
+                printf("combien fait %d * %d = ",table,j);
+                scanf("%d",&resultat);
+                if (resultat == j*table){
+                    printf("gagné\n");
+                } else {
+                    printf("perdu\n");
+                    if (reponse==bonne_reponse);
+                }
+            }
+        }
+        if (choix == 5){
+            a=rand()%101;
+            b=rand()%101;
+            while (b==0 || a%b!=0){
+                a=rand()%101;
+                b=rand()%101;
+            }
+            bonne_reponse= a/b;
+            int essais = 0;
+            int reussi=0;
+            while (essais < 3){
+                printf("%d / %d ?\n",a,b);
+                printf("entrez le resultat");
+                scanf("%d",&reponse);
+                essais++;
+                if (reponse==bonne_reponse){
+                    if(essais == 1)score+=10;
+                    else if (essais == 2)score +=5;
+                    else if (essais ==3)score +=1;
+                    printf("bravo vous avez trouvé en %d essai(s)\n ",essais);
+                    reussi=1;break;
+                } else {
+                    if (essais<3)
+                    printf("essayez encore\n");
+                }
+            }enrg_score(nom,score);
+            if (!reussi){
+                printf("la reponse etait %d\n",bonne_reponse);
+            }
+        } 
+        
+        if (choix == 6) {
+            a = rand() % 100;
+            bonne_reponse = 100 - a; 
+            int essais = 0;
+            int reussi=0;
+            while (essais < 3){
+                printf("quel est le complement à 100 de %d ?\n",a);
+                printf("entrez le resultat");
+                scanf("%d",&reponse);
+                essais++;
+                if (reponse==bonne_reponse){
+                    if(essais == 1)score+=10;
+                    else if (essais == 2)score +=5;
+                    else if (essais ==3)score +=1;
+                    printf("bravo vous avez trouvé en %d essai(s)\n ",essais);
+                    reussi=1;break;
+                } else {
+                    if (essais<3)
+                    printf("essayez encore\n");
+                }
+            }enrg_score(nom,score);
+            if (!reussi){
+                printf("la reponse etait %d\n",bonne_reponse);
+            }
+        } 
+        if (choix == 7) {
+            a = rand() % 101; // nombre entre 0 et 100
+            bonne_reponse = a * 2;
+            int essais = 0;
+            int reussi=0;
+            while (essais < 3){
+                printf("quel est le double de %d ?\n",a);
+                printf("entrez le resultat");
+                scanf("%d",&reponse);
+                essais++;
+                if (reponse==bonne_reponse){
+                    if(essais == 1)score+=10;
+                    else if (essais == 2)score +=5;
+                    else if (essais ==3)score +=1;
+                    printf("bravo vous avez trouvé en %d essai(s)\n ",essais);
+                    reussi=1;break;
+                } else {
+                    if (essais<3)
+                    printf("essayez encore\n");
+                }
+            }enrg_score(nom,score);
+            if (!reussi){
+                printf("la reponse etait %d\n",bonne_reponse);
+            }
+        }
+        if (choix == 8) {
+            int start = rand()%50;
+            bonne_reponse = start + 6;
+            int essais = 0;
+            int reussi=0;
+            while (essais < 3){
+                printf("complete la suite suivante \n");
+                printf("%d ,%d ,%d ,_ ,%d\n",start,start + 2,start + 4,start+ 8);
+                scanf("%d",&reponse);
+                essais++;
+                if (reponse==bonne_reponse){
+                    if(essais == 1)score+=10;
+                    else if (essais == 2)score +=5;
+                    else if (essais ==3)score +=1;
+                    printf("bravo vous avez trouvé en %d essai(s)\n ",essais);
+                    reussi=1;break;
+                } else {
+                    if (essais<3)
+                    printf("essayez encore\n");
+                }
+            }enrg_score(nom,score);
+            if (!reussi){
+                printf("la reponse etait %d\n",bonne_reponse);
+            }
+        }
+        }
+        enrg_score(nom,score);
+    printf("votre nombre de point est de : %d\n",score);
+    return 0;
+}
